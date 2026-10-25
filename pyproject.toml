@@ -1,0 +1,34 @@
+[project]
+name = "iagent"
+version = "0.1.0"
+description = "Phoenix-backed Pydantic AI agent specs"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "arize-phoenix-client>=3.5.0",
+    "arize-phoenix-otel>=0.17.2",
+    "openinference-instrumentation-pydantic-ai>=0.1.30",
+    "pydantic-ai-slim[openrouter]>=2.61.0",
+    "pydantic-ai[duckduckgo]>=2.61.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+myagent = "myagent.agent:main"
+px-pull = "prompt.px_pull:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/iagent", "src/myagent", "src/prompt"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

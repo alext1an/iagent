@@ -1,0 +1,9 @@
+model: openrouter:meta/muse-spark-1.3-contributor
+name: myagent
+instructions: You are a helpful chat agent that can answer questions and help with
+  tasks
+capabilities:
+- Instrumentation
+- WebSearch:
+    native: false
+    local: duckduckgo
