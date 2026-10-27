@@ -8,6 +8,8 @@ dependencies = [
     "arize-phoenix-client>=3.5.0",
     "arize-phoenix-otel>=0.17.2",
     "openinference-instrumentation-pydantic-ai>=0.1.30",
+    "openpyxl>=3.1.5",
+    "pandas>=3.1.0",
     "pydantic-ai-harness[skills]>=0.61.0",
     "pydantic-ai-slim[openrouter]>=2.61.0",
     "pydantic-ai[duckduckgo]>=2.61.0",
@@ -17,13 +19,14 @@ dependencies = [
 [project.scripts]
 myagent = "myagent.agent:main"
 px-pull = "prompt.px_pull:main"
+sheetagent = "sheetagent.agent:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/iagent", "src/myagent", "src/prompt"]
+packages = ["src/iagent", "src/myagent", "src/prompt", "src/sheetagent"]
 
 [dependency-groups]
 dev = [

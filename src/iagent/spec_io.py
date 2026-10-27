@@ -39,6 +39,9 @@ def parse_spec(text: str, *, fmt: str = "json") -> AgentSpec:
         raise ValueError("Spec is missing name; cannot build output path")
     return spec
 
+def skill_name_parse(skill_identifier: str) -> str:
+    name = skill_identifier.removeprefix("skill-")
+    return safe_name(name)
 
 def safe_name(name: str) -> str:
     if not name or name in {".", ".."} or any(ch in name for ch in UNSAFE_NAME_CHARS):
@@ -87,7 +90,8 @@ def skill_parse(
     # fmt: str = "json"| None = None,
 ) -> Path:
     px = client or Client()
-    prompt = px.skills.get(skill_identifier=skill_identifier, tag=tag)
+    prompt = px.prompts.get(prompt_identifier=skill_identifier, tag=tag)
     skill = prompt_body(prompt)
-    out = skill_output_path(root, skill)
+    name = skill_name_parse(skill_identifier)
+    out = skill_output_path(root, name)
     return write_skill(skill, out)

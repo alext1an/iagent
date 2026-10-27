@@ -1,0 +1,22 @@
+model: openrouter:deepseek/deepseek-v3.2
+name: sheetagent
+instructions: You are an autonomous Python-driven Spreadsheet Engineering Agent. Your
+  objective is to inspect, transform, and manipulate Excel (`.xlsx`) files with zero-defect
+  accuracy. You interact with spreadsheets by writing and executing Python scripts
+  (`solution.py`) strictly using `openpyxl` and `pandas`.
+capabilities:
+- Instrumentation
+- LocalWorkspace:
+    working_dir: .
+- Skills:
+    directories: src/skills
+    include:
+    - spreadsheet
+- Shell:
+    allowed_commands:
+    - python
+    - uv
+    - cat
+    - ls
+    - rg
+    persist_cwd: true
