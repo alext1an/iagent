@@ -8,9 +8,10 @@ SRC_ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    out = spec_parse("chat-agent", root=SRC_ROOT)
+    out = spec_parse("spec-sheetagent", root=SRC_ROOT)
     print(f"Wrote {out}")
-
+    out = skill_parse("skill-spreadsheet", root=SRC_ROOT)
+    print(f"Wrote {out}")
 
 if __name__ == "__main__":
     main()

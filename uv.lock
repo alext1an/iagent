@@ -760,6 +760,7 @@ dependencies = [
     { name = "arize-phoenix-otel" },
     { name = "openinference-instrumentation-pydantic-ai" },
     { name = "pydantic-ai", extra = ["duckduckgo"] },
+    { name = "pydantic-ai-harness", extra = ["skills"] },
     { name = "pydantic-ai-slim", extra = ["openrouter"] },
     { name = "python-dotenv" },
 ]
@@ -775,6 +776,7 @@ requires-dist = [
     { name = "arize-phoenix-otel", specifier = ">=0.17.2" },
     { name = "openinference-instrumentation-pydantic-ai", specifier = ">=0.1.30" },
     { name = "pydantic-ai", extras = ["duckduckgo"], specifier = ">=2.61.0" },
+    { name = "pydantic-ai-harness", extras = ["skills"], specifier = ">=0.61.0" },
     { name = "pydantic-ai-slim", extras = ["openrouter"], specifier = ">=2.61.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
 ]
@@ -929,6 +931,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bd/15/48ff246732232d35ee234228def22b52455fcc55577f06146602399a29b0/joserfc-1.7.7.tar.gz", hash = "sha256:471d0fd12a5a0d1c0942de280f39efe6f597878315033270b504d4d006d25510", size = 237446, upload-time = "2026-10-19T00:30:29.974Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/df/9f/934db284aa22f37af59708e382903860d4b81329c137b1b0ed2745daeb65/joserfc-1.7.7-py3-none-any.whl", hash = "sha256:06979cfbab78bc802f14c0358f32969826cc26720e13cb38926ffdc86bc0cb2c", size = 71758, upload-time = "2026-10-19T00:30:28.498Z" },
+]
+
+[[package]]
+name = "json-repair"
+version = "0.64.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/b2/52bdd0fca981b289a4d9966366e1dfe50fac315f2c87440fa70726bdcb69/json_repair-0.64.2.tar.gz", hash = "sha256:3f8e76631edab40e7e0c9b859e64c06992a39488b4bbb8285f0e9c3e61d684e9", size = 54227, upload-time = "2026-10-23T05:35:23.447Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/79/91b83df91d03b9647ee759f286900957f0d113f49a606e28c8a43d39365b/json_repair-0.64.2-py3-none-any.whl", hash = "sha256:1dec7868c05abff0c52e91dc896e01f28fda6ba1c9f2a9ede18ab520dde637e1", size = 52688, upload-time = "2026-10-23T05:35:21.978Z" },
 ]
 
 [[package]]
@@ -1613,6 +1624,26 @@ wheels = [
 [package.optional-dependencies]
 duckduckgo = [
     { name = "pydantic-ai-slim", extra = ["duckduckgo"] },
+]
+
+[[package]]
+name = "pydantic-ai-harness"
+version = "0.61.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "genai-prices" },
+    { name = "httpx" },
+    { name = "json-repair" },
+    { name = "pydantic-ai-slim" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/97/01/522cf4b0327bd7562560915407ee7d7f18e9dd29fae26ae954d85f6e7f7b/pydantic_ai_harness-0.61.0.tar.gz", hash = "sha256:895cd29712ca029430bdca67075c1c83662373b142c23db5fe68d15aefa1bb67", size = 1272746, upload-time = "2026-10-24T03:55:34.142Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ff/56/2870665ebfdb89594cd04072e17be5280adb25264f6faa4d5e6abf7552d3/pydantic_ai_harness-0.61.0-py3-none-any.whl", hash = "sha256:110b2ff92f914a24ea1b7f9cd1f5c1ded146c671430400e88cd999e5021ffca3", size = 1567129, upload-time = "2026-10-24T03:55:22.691Z" },
+]
+
+[package.optional-dependencies]
+skills = [
+    { name = "pyyaml" },
 ]
 
 [[package]]

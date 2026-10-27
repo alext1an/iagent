@@ -8,6 +8,7 @@ dependencies = [
     "arize-phoenix-client>=3.5.0",
     "arize-phoenix-otel>=0.17.2",
     "openinference-instrumentation-pydantic-ai>=0.1.30",
+    "pydantic-ai-harness[skills]>=0.61.0",
     "pydantic-ai-slim[openrouter]>=2.61.0",
     "pydantic-ai[duckduckgo]>=2.61.0",
     "python-dotenv>=1.0.0",
