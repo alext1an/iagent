@@ -1,6 +1,6 @@
 ---
 name: spreadsheet
-description: Work with spreadsheets: inspect, transform, and write CSV/XLSX in the workspace.
+description: Work with spreadsheets, inspect, transform, and write CSV/XLSX in the workspace.
 ---
 
 # Spreadsheet Manipulation Skill (xlsx)

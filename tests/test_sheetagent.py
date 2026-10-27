@@ -9,6 +9,7 @@ import openpyxl
 import pytest
 from pydantic_ai.models.test import TestModel
 from pydantic_ai_harness import Skills, Shell
+from pydantic_ai_harness.guardrails import ToolGuardrail
 
 from iagent.runtime import load_agent
 
@@ -23,6 +24,48 @@ def test_sheetagent_yaml_has_expected_fields() -> None:
     assert "spreadsheet" in text
     assert "LocalWorkspace" in text
     assert "Shell:" in text
+
+
+@pytest.mark.skipif(
+    os.name != "posix",
+    reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
+)
+def test_sheetagent_builds_with_spreadsheet_tools() -> None:
+    """The agent builds and runs; attaching the spreadsheet tools raises no schema errors."""
+    from sheetagent.agent import build_agent
+
+    agent = build_agent(model=TestModel(call_tools=[]), approve_commands=False)
+    result = agent.run_sync("hello")
+    assert isinstance(result.output, str)
+
+
+def _approval_guardrails(agent) -> list[ToolGuardrail]:
+    caps = agent.root_capability.capabilities
+    return [c for c in caps if isinstance(c, ToolGuardrail)]
+
+
+@pytest.mark.skipif(
+    os.name != "posix",
+    reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
+)
+def test_build_agent_attaches_approval_guardrail_when_enabled() -> None:
+    from sheetagent.agent import build_agent
+
+    agent = build_agent(model=TestModel(call_tools=[]), approve_commands=True)
+    guards = _approval_guardrails(agent)
+    assert len(guards) == 1
+    assert list(guards[0].tools) == ["run_command", "start_command"]
+
+
+@pytest.mark.skipif(
+    os.name != "posix",
+    reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
+)
+def test_build_agent_omits_approval_guardrail_when_disabled() -> None:
+    from sheetagent.agent import build_agent
+
+    agent = build_agent(model=TestModel(call_tools=[]), approve_commands=False)
+    assert _approval_guardrails(agent) == []
 
 
 @pytest.mark.skipif(

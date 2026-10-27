@@ -26,3 +26,6 @@ pytest.ini
 .cursor/
 .cursorrules
 .cursorignore
+
+# Storage
+.DS_Store
