@@ -29,3 +29,6 @@ pytest.ini
 
 # Storage
 .DS_Store
+
+# Ephemeral eval run outputs (records/work dirs are regenerated each run)
+eval/runs/
