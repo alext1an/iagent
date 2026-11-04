@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
-
-from pydantic_ai.models.test import TestModel
 
 from iagent.runtime import load_agent
 from iagent.tracing import load_env, setup_tracing
@@ -11,10 +8,15 @@ from iagent.tracing import load_env, setup_tracing
 SPEC_PATH = Path(__file__).with_name("agent.yaml")
 
 
+def build_agent(**kwargs):
+    """Construct myagent from its spec file."""
+    return load_agent(SPEC_PATH, **kwargs)
+
+
 def main() -> None:
     load_env()
     setup_tracing()
-    agent = load_agent(SPEC_PATH)
+    agent = build_agent()
     result = agent.run_sync(
         "Websearch for the latest news on the stock market in the last 24 hours"
     )

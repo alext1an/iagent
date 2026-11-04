@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from pydantic_ai.workspaces import LocalWorkspaceBackend
 from pydantic_ai_harness import Skills, Shell
 
 from iagent.approval import command_approval_guardrail
@@ -11,6 +12,7 @@ from iagent.tracing import load_env, setup_tracing
 from iagent.tools.spreadsheet import read_xlsx, summarize_xlsx
 
 SPEC_PATH = Path(__file__).with_name("agent.yaml")
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 TOOLS = [summarize_xlsx, read_xlsx]
 
@@ -22,6 +24,15 @@ def build_agent(*, approve_commands: bool = True, **kwargs):
     approved by a human at the terminal before it executes.
     """
     extra = list(kwargs.pop("capabilities", None) or [])
+    # The run workspace follows the process cwd. From eval/ that cwd does not
+    # contain src/skills, so the spreadsheet skill is read from the repo root.
+    extra.append(
+        Skills(
+            "src/skills",
+            include=["spreadsheet"],
+            workspace=LocalWorkspaceBackend(REPO_ROOT),
+        )
+    )
     if approve_commands:
         extra.append(command_approval_guardrail())
     return load_agent(

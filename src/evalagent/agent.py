@@ -2,25 +2,36 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic_ai_harness import FileSystem
+from pydantic_ai.workspaces import LocalWorkspaceBackend
+from pydantic_ai_harness import FileSystem, Shell, Skills
 
 from iagent.runtime import load_agent
 from iagent.tracing import load_env, setup_tracing
 
 SPEC_PATH = Path(__file__).with_name("agent.yaml")
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def build_agent(**kwargs):
     """Construct the evalagent: reads a benchmark, writes a loader.
 
-    It mounts FileSystem (bounded file access) but NOT Shell or Spreadsheet -- it
-    never solves tasks and never executes scoring. The dataset tree is read-only;
-    the loader is written to the approval area, then golden-checked and human
-    approved before the deterministic runner ever imports it.
+    FileSystem keeps dataset/ read-only and limits writes to workspace/.
+    Shell can run python for the upload script and the experiment runner.
+    dataset-upload and phoenix-runner live outside this agent's working
+    directory. The spec says which step loads each skill.
     """
+    extra = list(kwargs.pop("capabilities", None) or [])
+    extra.append(
+        Skills(
+            "src/skills",
+            include=["dataset-upload", "phoenix-runner"],
+            workspace=LocalWorkspaceBackend(REPO_ROOT),
+        )
+    )
     return load_agent(
         SPEC_PATH,
-        custom_capability_types=[FileSystem],
+        custom_capability_types=[FileSystem, Shell, Skills],
+        capabilities=extra,
         **kwargs,
     )
 

@@ -30,6 +30,20 @@ def test_sheetagent_yaml_has_expected_fields() -> None:
     os.name != "posix",
     reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
 )
+def test_sheetagent_builds_when_cwd_is_eval(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The experiment runner starts in eval/, where src/skills is not a child."""
+    monkeypatch.chdir(REPO / "eval")
+    from sheetagent.agent import build_agent
+
+    agent = build_agent(model=TestModel(call_tools=[]), approve_commands=False)
+    result = agent.run_sync("hello")
+    assert isinstance(result.output, str)
+
+
+@pytest.mark.skipif(
+    os.name != "posix",
+    reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
+)
 def test_sheetagent_builds_with_spreadsheet_tools() -> None:
     """The agent builds and runs; attaching the spreadsheet tools raises no schema errors."""
     from sheetagent.agent import build_agent

@@ -12,6 +12,8 @@ capabilities:
     directories: src/skills
     include:
     - spreadsheet
+    missing_directories: skip
+    unknown_names: skip
 - Shell:
     allowed_commands:
     - python
@@ -20,3 +22,4 @@ capabilities:
     - ls
     - rg
     persist_cwd: true
+    default_timeout: 270

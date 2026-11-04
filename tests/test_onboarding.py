@@ -127,17 +127,22 @@ def test_approve_and_pin_writes_pin_on_both(tmp_path: Path) -> None:
 
 
 def test_evalagent_yaml_has_expected_shape() -> None:
-    # Cross-platform: evalagent mounts FileSystem, NOT Shell or Spreadsheet,
-    # and keeps the dataset tree read-only.
+    # dataset/ is read-only. python is allowed so an approved loader can be run.
+    # Spreadsheet stays off this agent.
     from pathlib import Path as _P
 
     spec = _P(__file__).resolve().parents[1] / "src" / "evalagent" / "agent.yaml"
     text = spec.read_text(encoding="utf-8")
     assert "name: evalagent" in text
     assert "FileSystem:" in text
-    assert "eval/dataset/**" in text
-    assert "Shell:" not in text
+    assert "dataset/**" in text
+    assert "Shell:" in text
+    assert "python" in text
     assert "Spreadsheet" not in text
+    assert "Load dataset-upload" in text
+    assert "load phoenix-runner" in text
+    assert "create_dataset" not in text
+    assert "loader.py" not in text
 
 
 @pytest.mark.skipif(
