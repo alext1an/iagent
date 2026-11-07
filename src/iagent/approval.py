@@ -41,16 +41,42 @@ async def _ask_operator(call: ToolCallInfo) -> GuardrailResult:
     return GuardrailResult.block("Command denied by the operator.")
 
 
-def command_approval_guardrail(*,
-                               tools: list[str] | None = None,
-                               ask: AskFn | None = None
-                               ) -> ToolGuardrail:
+def _is_listed(command: str, listed: Sequence[str]) -> bool:
+    """True when ``command`` is a listed command or that command plus arguments."""
+    text = command.strip()
+    for entry in listed:
+        item = entry.strip()
+        if item and (text == item or text.startswith(item + " ")):
+            return True
+    return False
+
+
+def command_approval_guardrail(
+    *,
+    tools: list[str] | None = None,
+    ask: AskFn | None = None,
+    auto_approve: Sequence[str] = (),
+) -> ToolGuardrail:
     """A `ToolGuardrail` that asks a human to approve each shell command.
+
+    Commands in ``auto_approve`` pass without a prompt. An entry matches the
+    whole command, or the same command followed by a space and arguments.
+    ``python workspace/upload_dataset.py`` matches that script with extra
+    arguments. ``python`` matches every command that starts with ``python``.
 
     Args:
         ask: Async callback that returns allow/block. Defaults to a terminal prompt.
         tools: Tool names to gate. Defaults to `run_command` and `start_command`.
+        auto_approve: Commands that skip the prompt. Empty by default.
     Returns:
         A `ToolGuardrail` to add to an agent's `capabilities`.
     """
-    return ToolGuardrail(guard=ask or _ask_operator, tools=list(tools or COMMAND_TOOLS))
+    asker = ask or _ask_operator
+    listed = tuple(auto_approve)
+
+    async def guard(call: ToolCallInfo) -> GuardrailResult:
+        if _is_listed(_command_text(call), listed):
+            return GuardrailResult.allow()
+        return await asker(call)
+
+    return ToolGuardrail(guard=guard, tools=list(tools or COMMAND_TOOLS))

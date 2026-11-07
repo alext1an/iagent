@@ -17,6 +17,8 @@ Never use any other third-party libraries.
 
 1. **Explore** the input file: list sheets, inspect headers, check dimensions.
 
+Use `read_xlsx` with `cell_range` (for example `B40:N80`) for areas that do not start at A1. Each cell shows its value or its formula plus cached value. `blank` is an empty cell and is different from `0` and the text `'0'`. `cache=(none)` means the file has the formula but no calculated result. Number formats other than General are shown.
+
 - Inspect actual workbook data beyond the preview, including nearby rows/columns, sample outputs, formulas, labels, headers, and any reference/example sheets such as `Output`, `Manual Result`, or `Desired...` tabs.
 
 - Treat existing filled cells in the requested output area or adjacent example tables as semantic examples for edge cases and expected formats, but still recompute and write the complete requested target range.
@@ -24,7 +26,7 @@ Never use any other third-party libraries.
    - Locate tables, fields, and target ranges by header text, nearby labels, and surrounding nonblank structure rather than fixed coordinates. Build header maps from actual cells when useful, e.g. `{str(cell.value).strip(): cell.column}`.
 2. **Write `solution.py`** with `INPUT_PATH` and `OUTPUT_PATH` defined at the top.
 3. **Execute** `python solution.py` and verify the output file was created.
-4. **Confirm** the target cells/range contain the expected values.
+4. **Confirm** the target cells/range contain the expected values. Call `diff_xlsx` with the output workbook and the input workbook and read which cells changed. Fix edits outside the requested target. Do not compare against a golden workbook.
 
 ---
 
@@ -107,7 +109,6 @@ wb.save(OUTPUT_PATH)
 
 - Prefer simple, auditable row/column loops over complex workbook XML parsing unless the task truly requires unsupported workbook internals. Before returning, run the script once to catch syntax/indentation errors and verify that representative target rows were actually written.
 
-<!-- SLOW_UPDATE_START -->
 When the user asks for a formula, macro, VBA code, or a fix to an Excel formula, still deliver the completed workbook state: compute the intended results in Python and write literal final values into the requested cells. Do not write formula strings unless the task explicitly says the output must contain live formulas.
 
 After writing, reload or inspect the saved workbook and verify that every requested/evaluated target cell contains a non-formula literal where a value is expected. If a target cell is still `None` unexpectedly, fix the script before finishing.
@@ -135,4 +136,3 @@ For time-threshold rows, decide per row whether it is a normal data row or a sum
 Keep scripts simple enough to run cleanly. Avoid unnecessary dynamic code generation and fragile f-strings with regex expressions inside them. Always execute the final `solution.py`; fix any syntax, indentation, or runtime error, then verify representative target cells.
 
 If workbook cells contain arbitrary sample text that could be sensitive or trigger content filters, do not quote large raw cell contents in your response. Process them locally in Python with neutral variable names and output only the completed script/workbook changes.
-<!-- SLOW_UPDATE_END -->

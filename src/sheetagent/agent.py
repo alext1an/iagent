@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 
 from pydantic_ai.workspaces import LocalWorkspaceBackend
@@ -9,19 +10,20 @@ from pydantic_ai_harness import Skills, Shell
 from iagent.approval import command_approval_guardrail
 from iagent.runtime import load_agent
 from iagent.tracing import load_env, setup_tracing
-from iagent.tools.spreadsheet import read_xlsx, summarize_xlsx
+from iagent.tools.spreadsheet import diff_xlsx, read_xlsx, summarize_xlsx
 
 SPEC_PATH = Path(__file__).with_name("agent.yaml")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-TOOLS = [summarize_xlsx, read_xlsx]
+TOOLS = [summarize_xlsx, read_xlsx, diff_xlsx]
 
 
-def build_agent(*, approve_commands: bool = True, **kwargs):
+def build_agent(*, approve_commands: bool = True, auto_approve: Sequence[str] = (), **kwargs):
     """Construct the sheetagent with its spreadsheet inspection tools attached.
 
     When ``approve_commands`` is True, each shell command the agent runs must be
-    approved by a human at the terminal before it executes.
+    approved by a human at the terminal before it executes. Commands in
+    ``auto_approve`` skip that prompt.
     """
     extra = list(kwargs.pop("capabilities", None) or [])
     # The run workspace follows the process cwd. From eval/ that cwd does not
@@ -34,7 +36,7 @@ def build_agent(*, approve_commands: bool = True, **kwargs):
         )
     )
     if approve_commands:
-        extra.append(command_approval_guardrail())
+        extra.append(command_approval_guardrail(auto_approve=auto_approve))
     return load_agent(
         SPEC_PATH,
         custom_capability_types=[Skills, Shell],

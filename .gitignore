@@ -32,3 +32,4 @@ pytest.ini
 
 # Ephemeral eval run outputs (records/work dirs are regenerated each run)
 eval/*
+runs/*

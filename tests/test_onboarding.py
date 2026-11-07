@@ -141,6 +141,7 @@ def test_evalagent_yaml_has_expected_shape() -> None:
     assert "Spreadsheet" not in text
     assert "Load dataset-upload" in text
     assert "load phoenix-runner" in text
+    assert "Load phoenix-eval" in text
     assert "create_dataset" not in text
     assert "loader.py" not in text
 
@@ -151,9 +152,28 @@ def test_evalagent_yaml_has_expected_shape() -> None:
 )
 def test_evalagent_builds() -> None:
     from pydantic_ai.models.test import TestModel
+    from pydantic_ai_harness.guardrails import ToolGuardrail
 
     from evalagent.agent import build_agent
 
     agent = build_agent(model=TestModel(call_tools=[]))
     result = agent.run_sync("hello")
     assert isinstance(result.output, str)
+    guards = [c for c in agent.root_capability.capabilities if isinstance(c, ToolGuardrail)]
+    assert len(guards) == 1
+    assert list(guards[0].tools) == ["run_command", "start_command"]
+
+
+@pytest.mark.skipif(
+    __import__("os").name != "posix",
+    reason="LocalWorkspace requires POSIX (use WSL/Linux for full agent load)",
+)
+def test_evalagent_omits_approval_guardrail_when_disabled() -> None:
+    from pydantic_ai.models.test import TestModel
+    from pydantic_ai_harness.guardrails import ToolGuardrail
+
+    from evalagent.agent import build_agent
+
+    agent = build_agent(model=TestModel(call_tools=[]), approve_commands=False)
+    guards = [c for c in agent.root_capability.capabilities if isinstance(c, ToolGuardrail)]
+    assert guards == []

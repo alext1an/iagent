@@ -7,17 +7,17 @@ description: Write a Phoenix experiment script for an agent and a dataset that w
 
 Follow this skill only after the human has answered which agent to run and has confirmed the dataset name and fields. Those answers must match `workspace/upload_dataset.py`. Do not invent a second schema. Do not modify `dataset/`. This script is not the upload script.
 
-The shell working directory is `eval/`. Write `workspace/run_eval.py`, then run `python workspace/run_eval.py`.
+The shell working directory is `eval/`. Write `workspace/run_eval.py` and stop. Do not run it. The evaluator is attached by a later step.
 
 `Client()` reads `PHOENIX_ENDPOINT` or `PHOENIX_COLLECTOR_ENDPOINT`, and `PHOENIX_API_KEY` when the server requires one. Do not write keys into the script.
 
 `get_dataset(dataset=...)` takes the same Phoenix name the upload script used. `run_experiment` calls `task` once per example. A one-argument `task` receives that example's `input`. The task must not read `expected`; `expected` is the hidden answer stored in the example's `output` field.
 
-The task copies only `input["files"]` into `workspace/runs/<id>/`. Paths are relative to `metadata["dataset_root"]`, the same value the upload script stored. It then calls the agent the human named, with `input["instruction"]` and that work directory, and returns the agent's output string.
+The task copies only `input["files"]` into `workspace/runs/<id>/`. Paths are relative to `metadata["dataset_root"]`, the same value the upload script stored. It then calls the agent the human named, with `input["instruction"]` and that work directory. Return only the task output the human named. Do not default the return to the work directory, to a file inside it, or to any other path. If the human did not name the return value, stop and ask before writing it.
 
 Import that agent through the `build_agent` the human gave you, for example `sheetagent.agent`. Construct it once. A Phoenix experiment has no terminal, so pass `approve_commands=False`. The default asks `approve? [y/N]` on stdin and the run dies with `EOFError`.
 
-The first run passes `dry_run=1`, which checks one example and stores nothing. Pass `timeout=600` and `retries=0`. Phoenix's default timeout is 60 seconds and then it retries the task; one sheetagent run does not finish in 60 seconds. Report the printed summary. Run again with `dry_run=False` only after the human asks to record the experiment, and then report the experiment URL.
+Pass `timeout=600` and `retries=0`. Phoenix's default timeout is 60 seconds and then it retries the task; one agent run does not finish in 60 seconds. Leave `dry_run=1`. Do not add `evaluators` here.
 
 ```python
 """Phoenix experiment for one uploaded dataset. The shell working directory is eval/."""
@@ -42,7 +42,7 @@ def task(input, metadata):
     result = agent.run_sync(
         f"{input['instruction']}\nThe task files are in {work.as_posix()}."
     )
-    return str(result.output)
+    return result  # replace with the task output the human named
 
 
 def main() -> None:

@@ -15,18 +15,25 @@ REPO = Path(__file__).resolve().parents[1]
 def test_eval_skills_load() -> None:
     skills = Skills(
         "src/skills",
-        include=["dataset-upload", "phoenix-runner"],
+        include=["dataset-upload", "phoenix-runner", "phoenix-eval"],
         workspace=LocalWorkspaceBackend(REPO),
     )
     catalog = asyncio.run(skills.load())
     by_name = {skill.name: skill for skill in catalog.skills}
-    assert set(by_name) == {"dataset-upload", "phoenix-runner"}
+    assert set(by_name) == {"dataset-upload", "phoenix-runner", "phoenix-eval"}
     upload = by_name["dataset-upload"].render()
     runner = by_name["phoenix-runner"].render()
+    evaluator = by_name["phoenix-eval"].render()
     assert "create_dataset" in upload
     assert "python workspace/upload_dataset.py" in upload
     assert "run_experiment" in runner
     assert "loader.py" not in runner
+    assert "return work.as_posix()" not in runner
+    assert "Do not default the return" in runner
+    assert "evaluators=[" not in runner
+    assert "workspace/evaluate.py" in evaluator
+    assert "evaluators=[evaluate]" in evaluator
+    assert "Do not modify it" in evaluator
     assert catalog.skipped == ()
 
 

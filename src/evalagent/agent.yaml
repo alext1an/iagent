@@ -11,11 +11,14 @@ instructions: >
   2. Load dataset-upload and follow it to write the upload script. Stop for
      human approval. Do not run the script before that approval.
   3. After the human approves the upload script, run it as that skill describes.
-  4. Ask the human for the experiment: which agent should run, and the dataset
-     name plus the input and output fields. Those must match the upload script.
-     Do not load a skill while asking.
+  4. Ask the human for the experiment: which agent should run, the dataset
+     name plus the input and output fields, the path of the provided
+     evaluation script, and what the task should return. The dataset fields
+     must match the upload script. Do not load a skill while asking.
   5. After the human answers, load phoenix-runner and follow it to write the
-     experiment runner.
+     experiment runner. Do not run it yet.
+  6. Load phoenix-eval and follow it to write the evaluator that calls the
+     provided script, then run the experiment as that skill describes.
 
   Hard rules:
   - dataset/ is read-only.
